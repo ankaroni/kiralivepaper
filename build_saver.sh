@@ -8,7 +8,7 @@ rm -rf "$OUT"
 mkdir -p "$OUT/Contents/MacOS" "$OUT/Contents/Resources"
 swiftc -emit-library -Xlinker -bundle -module-name HavaliSaver -target arm64-apple-macos14.0 -O \
   -framework ScreenSaver -framework SwiftUI -framework AppKit -framework AVFoundation \
-  $S/EffectsCore.swift $S/SceneRender.swift saver/SaverView.swift \
+  $S/EffectsCore.swift $S/SceneRender.swift $S/SaverClock.swift saver/SaverView.swift \
   -o "$OUT/Contents/MacOS/HavaliDuvar"
 cat > "$OUT/Contents/Info.plist" <<PL
 <?xml version="1.0" encoding="UTF-8"?>

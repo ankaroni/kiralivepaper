@@ -120,6 +120,8 @@ final class WallpaperController: ObservableObject {
         if let data = d.data(forKey: "fx"), let v = try? JSONDecoder().decode(EffectConfig.self, from: data) { fx = v }
         else { fx = EffectConfig() }
         pauseMode = PauseMode(rawValue: d.string(forKey: "pauseMode") ?? "") ?? .anyWindow
+        if let data = d.data(forKey: "saverClock"), let v = try? JSONDecoder().decode(SaverClockSettings.self, from: data) { saverClock = v }
+        else { saverClock = SaverClockSettings() }
         pauseOnBattery = d.object(forKey: "pauseOnBattery") as? Bool ?? true
         launchAtLogin = SMAppService.mainApp.status == .enabled
     }
@@ -133,6 +135,13 @@ final class WallpaperController: ObservableObject {
     }
     private var configExportTask: Task<Void, Never>?
     @Published private(set) var saverStatus = ""
+    /// Ekran koruyucudaki saat (açık/kapalı, konum, biçim)
+    @Published var saverClock: SaverClockSettings {
+        didSet {
+            if let d = try? JSONEncoder().encode(saverClock) { UserDefaults.standard.set(d, forKey: "saverClock") }
+            writeSaverClock()
+        }
+    }
     /// Sistemdeki "Ekran koruyucuyu başlat" süresi (dakika, 0 = asla)
     @Published private(set) var saverIdleMinutes: Int = WallpaperController.readSaverIdle()
 
@@ -172,6 +181,12 @@ final class WallpaperController: ObservableObject {
         }
     }
 
+    private func writeSaverClock() {
+        guard FileManager.default.fileExists(atPath: saverDir.path),
+              let d = try? JSONEncoder().encode(saverClock) else { return }
+        try? d.write(to: saverDir.appendingPathComponent("clock.json"))
+    }
+
     private func writeSaverConfig() {
         guard FileManager.default.fileExists(atPath: saverDir.path),
               let d = try? JSONEncoder().encode(fx) else { return }
@@ -198,6 +213,7 @@ final class WallpaperController: ObservableObject {
                 where f.lastPathComponent.hasPrefix("video.") { try? FileManager.default.removeItem(at: f) }
                 try FileManager.default.copyItem(at: v, to: dir.appendingPathComponent("video." + v.pathExtension))
                 try "video".write(to: dir.appendingPathComponent("mode.txt"), atomically: true, encoding: .utf8)
+                if let c = try? JSONEncoder().encode(self.saverClock) { try? c.write(to: dir.appendingPathComponent("clock.json")) }
                 saverStatus = "Ekran koruyucu hazır (video)"
             } catch { saverStatus = "Video aktarılamadı: \(error.localizedDescription)" }
             return
@@ -205,6 +221,7 @@ final class WallpaperController: ObservableObject {
         guard !urls.isEmpty else { saverStatus = "Önce anime fotoğrafı seçin"; return }
         saverStatus = "Ekran koruyucu hazırlanıyor…"
         let cfgData = try? JSONEncoder().encode(fx)
+        let clockData = try? JSONEncoder().encode(saverClock)
         Task.detached {
             do { try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true) }
             catch { await MainActor.run { self.saverStatus = "Klasör oluşturulamadı: \(error.localizedDescription)" }; return }
@@ -226,6 +243,7 @@ final class WallpaperController: ObservableObject {
             }
             if let d = try? JSONEncoder().encode(["count": written]) { try? d.write(to: dir.appendingPathComponent("manifest.json")) }
             try? "photos".write(to: dir.appendingPathComponent("mode.txt"), atomically: true, encoding: .utf8)
+            if let c = clockData { try? c.write(to: dir.appendingPathComponent("clock.json")) }
             if let c = cfgData { try? c.write(to: dir.appendingPathComponent("config.json")) }
             await MainActor.run { self.saverStatus = written > 0 ? "Ekran koruyucu hazır (\(written) fotoğraf)" : "Hata: dosyalar yazılamadı" }
         }

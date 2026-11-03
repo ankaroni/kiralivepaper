@@ -33,6 +33,15 @@ struct MenuContent: View {
             }
         }
         Button("Ekran Koruyucuyu Şimdi Başlat") { c.startSaverNow() }
+        Toggle("Ekran koruyucuda saat göster", isOn: $c.saverClock.enabled)
+        Menu("Saat konumu: \(SaverClockSettings.positions.first { $0.id == c.saverClock.position }?.title ?? "")") {
+            ForEach(SaverClockSettings.positions, id: \.id) { p in
+                Button((c.saverClock.position == p.id ? "✓  " : "     ") + p.title) { c.saverClock.position = p.id }
+            }
+            Divider()
+            Toggle("24 saat biçimi", isOn: $c.saverClock.use24h)
+            Toggle("Saniyeyi göster", isOn: $c.saverClock.showSeconds)
+        }
         Button("Ekran Koruyucuyu Güncelle") { c.exportSaverAssets() }
         if !c.saverStatus.isEmpty { Text(c.saverStatus) }
         Button("Efektleri Düzenle…") {

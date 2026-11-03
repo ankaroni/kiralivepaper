@@ -10,6 +10,7 @@ final class SaverAssets {
         .appendingPathComponent("HavaliDuvar")
     private(set) var count = 0
     private(set) var cfg = EffectConfig()
+    private(set) var clock = SaverClockSettings()
     private var cache: [Int: Item] = [:]
 
     init() { reload() }
@@ -17,6 +18,8 @@ final class SaverAssets {
     func reload() {
         if let d = try? Data(contentsOf: dir.appendingPathComponent("manifest.json")),
            let m = try? JSONDecoder().decode([String: Int].self, from: d) { count = m["count"] ?? 0 }
+        if let d = try? Data(contentsOf: dir.appendingPathComponent("clock.json")),
+           let c = try? JSONDecoder().decode(SaverClockSettings.self, from: d) { clock = c }
         if let d = try? Data(contentsOf: dir.appendingPathComponent("config.json")),
            let c = try? JSONDecoder().decode(EffectConfig.self, from: d) { cfg = c }
     }
@@ -43,6 +46,14 @@ struct SaverRoot: View {
     private let cycle = 20.0, fade = 2.0
 
     var body: some View {
+        ZStack {
+            scene
+            SaverClockView(s: assets.clock)
+        }
+        .ignoresSafeArea()
+    }
+
+    private var scene: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { ctx in
             Canvas { g, size in
                 g.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.black))
@@ -113,6 +124,10 @@ final class HavaliSaverView: ScreenSaverView {
             layer?.addSublayer(pl)
             player = q; playerLayer = pl
             q.play()
+            let clock = NSHostingView(rootView: SaverClockView(s: SaverAssets().clock))
+            clock.frame = bounds
+            clock.autoresizingMask = [.width, .height]
+            addSubview(clock)
             return
         }
         let h = NSHostingView(rootView: SaverRoot())
