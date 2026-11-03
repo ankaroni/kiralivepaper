@@ -39,6 +39,17 @@ struct MenuContent: View {
                 Button((c.saverClock.position == p.id ? "✓  " : "     ") + p.title) { c.saverClock.position = p.id }
             }
             Divider()
+            Menu("Saat stili: \(SaverClockSettings.styles.first { $0.id == c.saverClock.style }?.title ?? "")") {
+                ForEach(SaverClockSettings.styles, id: \.id) { st in
+                    Button((c.saverClock.style == st.id ? "✓  " : "     ") + st.title) { c.saverClock.style = st.id }
+                }
+            }
+            Menu("Saat rengi: \(SaverClockSettings.colors.first { $0.id == c.saverClock.color }?.title ?? "")") {
+                ForEach(SaverClockSettings.colors, id: \.id) { col in
+                    Button((c.saverClock.color == col.id ? "✓  " : "     ") + col.title) { c.saverClock.color = col.id }
+                }
+            }
+            Divider()
             Toggle("24 saat biçimi", isOn: $c.saverClock.use24h)
             Toggle("Saniyeyi göster", isOn: $c.saverClock.showSeconds)
         }
