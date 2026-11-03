@@ -28,4 +28,6 @@ codesign --force --sign - "$OUT" 2>/dev/null || true
 mkdir -p "$HOME/Library/Screen Savers"
 rm -rf "$HOME/Library/Screen Savers/HavaliDuvar.saver"
 cp -R "$OUT" "$HOME/Library/Screen Savers/"
+# Sistem eski sürümü bellekte tutar; yeni sürüm yüklensin diye çalışan koruyucu süreçlerini kapat
+killall legacyScreenSaver ScreenSaverEngine 2>/dev/null || true
 echo "Kuruldu: $HOME/Library/Screen Savers/HavaliDuvar.saver"
