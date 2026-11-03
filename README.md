@@ -1,4 +1,4 @@
-# KiraDuvar
+# Nebula
 
 macOS için canlı duvar kağıdı ve ekran koruyucu (SwiftUI). Menü çubuğunda yaşar.
 
