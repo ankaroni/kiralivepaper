@@ -23,3 +23,7 @@ Gereksinim: macOS 14+, Xcode komut satırı araçları (Swift 5.9+).
 ## Notlar
 - Ekran koruyucu yalnızca kendi güvenlik kutusundaki dosyaları okur; uygulama fotoğraf/video ve efekt ayarlarını oraya otomatik aktarır.
 - Uygulama imzasızdır (ad-hoc). İlk açılışta engellenirse: sağ tık → Aç.
+
+## Lisans
+
+MIT, bkz. [LICENSE](LICENSE).
