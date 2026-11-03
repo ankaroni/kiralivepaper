@@ -1,6 +1,6 @@
-# Nebula
+# kiralivepaper
 
-macOS için canlı duvar kağıdı ve ekran koruyucu (SwiftUI). Menü çubuğunda yaşar.
+**Live wallpaper & screen saver for macOS.** Canlı duvar kağıdı ve ekran koruyucu (SwiftUI). Menü çubuğunda yaşar.
 
 ## Özellikler
 - **Duvar kağıtları:** Yıldızlı Gökyüzü, Parıldayan Küreler, Gradyan Dalgalar, kendi videonuz, anime fotoğraf gösterisi
